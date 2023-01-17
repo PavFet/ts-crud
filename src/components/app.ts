@@ -5,7 +5,7 @@ class App {
 
   private carsCollection: CarsCollection;
 
-  constructor(selector: string) {
+  public constructor(selector: string) {
     const foundElement = document.querySelector<HTMLElement>(selector);
     this.carsCollection = new CarsCollection({ cars, brands, models });
 
@@ -14,7 +14,7 @@ class App {
     this.htmlElement = foundElement;
   }
 
-  initialize = (): void => {
+  public initialize = (): void => {
     const container = document.createElement('div');
     container.className = 'container my-5';
     container.innerHTML = 'Laukiu kol būsiu sukurtas';

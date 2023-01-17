@@ -1,7 +1,7 @@
-import Car from '../types/car';
-import Model from '../types/model';
-import Brand from '../types/brand';
-import CarJoined from '../types/car-joined';
+import type Car from '../types/car';
+import type Model from '../types/model';
+import type Brand from '../types/brand';
+import type CarJoined from '../types/car-joined';
 
 type CarsCollectionProps = {
   cars: Car[],
@@ -12,7 +12,7 @@ type CarsCollectionProps = {
 class CarsCollection {
   private props: CarsCollectionProps;
 
-  constructor(props: CarsCollectionProps) {
+  public constructor(props: CarsCollectionProps) {
     this.props = props;
   }
 
