@@ -1,8 +1,13 @@
+import CarsCollection from '../helpers/cars-collection';
+
 class App {
   private htmlElement: HTMLElement;
 
+  private carsCollection: CarsCollection;
+
   constructor(selector: string) {
     const foundElement = document.querySelector<HTMLElement>(selector);
+    this.carsCollection = new CarsCollection({ cars, brands, models });
 
     if (foundElement === null) throw new Error(`Nerastas elementas su selektoriumi '${selector}'`);
 
