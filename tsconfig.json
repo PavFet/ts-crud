@@ -23,6 +23,10 @@
     "skipLibCheck": true // ar praleisti tipų tikrinimą naudojant bibliotekas
   },
   "include": [
-    "src/main.ts"
+    "src/main.ts",
+    "src/types/*",
+    "src/data/*",
+    "src/components/*",
+    "src/helpers/*",
   ]
 }
