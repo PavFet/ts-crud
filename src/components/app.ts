@@ -49,6 +49,26 @@ class App {
 
   private handleBrandChange = (brandId: string): void => {
     this.selectedBrandId = brandId;
+    this.update();
+  };
+
+  private update = (): void => {
+    const { selectedBrandId, carsCollection } = this;
+
+    if (selectedBrandId === null) {
+      this.carTable.updateProps({
+        title: 'All cars',
+        rowsData: carsCollection.allCars.map(stringifyProps),
+      });
+    } else {
+      const brand = brands.find((b) => b.id === selectedBrandId);
+      if (brand === undefined) throw new Error('Brand is not exist');
+
+      this.carTable.updateProps({
+        title: `${brand.title} Car brand`,
+        rowsData: carsCollection.getByBrandId(selectedBrandId).map(stringifyProps),
+      });
+    }
   };
 
   public initialize = (): void => {
