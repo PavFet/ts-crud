@@ -2,6 +2,7 @@ export type TableProps<Type> = {
   title: string,
   columns: Type,
   rowsData: Type[],
+  onDelete: (id: string) => void,
 };
 
 type RowData = {
@@ -25,17 +26,18 @@ class Table<T extends RowData> {
     this.tbody = document.createElement('tbody');
 
     this.initialize();
+    this.renderView();
   }
 
   private initializeHead = () => {
     const { title, columns } = this.props;
 
     const headersArrays = Object.values(columns);
-    const headersRowHtmlStr = headersArrays.map((header) => `<th>${header}</th>`).join('');
+    const headersRowHtmlStr = `${headersArrays.map((header) => `<th>${header}</th>`).join('')}<th></th>`;
 
     this.thead.innerHTML = `
     <tr>
-      <th colspan="${headersArrays.length}" class="text-center h3">${title}</th>
+      <th colspan="${headersArrays.length + 1}" class="text-center h3">${title}</th>
     </tr>
     <tr>${headersRowHtmlStr}</tr>
     `;
@@ -66,6 +68,71 @@ class Table<T extends RowData> {
       this.tbody,
     );
    };
+
+   private renderView = (): void => {
+    this.renderHeadView();
+    this.renderBodyView();
+  };
+
+  private renderHeadView = (): void => {
+    const { title, columns } = this.props;
+
+    const headersArray = Object.values(columns);
+    const headersRowHtmlString = headersArray.map((header) => `<th>${header}</th>`).join('');
+
+    this.thead.innerHTML = `
+      <tr>
+        <th colspan="${headersArray.length}" class="text-center h3">${title}</th>
+      </tr>
+      <tr>${headersRowHtmlString}</tr>`;
+  };
+
+  private renderBodyView = (): void => {
+    const { rowsData, columns } = this.props;
+
+    this.tbody.innerHTML = '';
+    const rowsHtmlElements = rowsData
+      .map((rowData) => {
+        const rowHtmlElement = document.createElement('tr');
+
+        const cellsHtmlString = Object.keys(columns)
+          .map((key) => `<td>${rowData[key]}</td>`)
+          .join(' ');
+
+        rowHtmlElement.innerHTML = cellsHtmlString;
+
+        this.addActionsCell(rowHtmlElement, rowData.id);
+
+        return rowHtmlElement;
+      });
+
+    this.tbody.append(...rowsHtmlElements);
+  };
+
+  private addActionsCell = (rowHtmlElement: HTMLTableRowElement, id: string): void => {
+    const { onDelete } = this.props;
+
+    const buttonCell = document.createElement('td');
+
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.innerHTML = 'Delete';
+    deleteButton.className = 'btn btn-danger';
+    deleteButton.addEventListener('click', () => onDelete(id));
+    deleteButton.style.width = '80px';
+
+    buttonCell.append(deleteButton);
+    rowHtmlElement.append(buttonCell);
+  };
+
+   public updateProps = (newProps: Partial<TableProps<Type>>): void => {
+    this.props = {
+      ...this.props,
+      ...newProps,
+    };
+
+    this.renderView();
+  };
 }
 
 export default Table;

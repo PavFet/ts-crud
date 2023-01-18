@@ -33,6 +33,7 @@ class App {
         year: 'Year',
       },
       rowsData: this.carsCollection.allCars.map(stringifyProps),
+      onDelete: () => { },
     });
     this.brandSelect = new SelectField({
       labelText: 'Brand',
