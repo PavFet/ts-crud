@@ -33,11 +33,14 @@ class App {
         year: 'Year',
       },
       rowsData: this.carsCollection.allCars.map(stringifyProps),
-      onDelete: () => { },
+      onDelete: this.handleCarDelete,
     });
     this.brandSelect = new SelectField({
-      labelText: 'Brand',
-      options: brands.map(({ id, title }) => ({ title, value: id })),
+      labelText: 'Brands',
+      options: [
+        ...brands.map(({ id, title }) => ({ title, value: id })),
+        { title: 'All brands', value: '-1' },
+      ],
       onChange: this.handleBrandChange,
     });
     this.selectedBrandId = null;
@@ -49,6 +52,12 @@ class App {
 
   private handleBrandChange = (brandId: string): void => {
     this.selectedBrandId = brandId;
+    this.update();
+  };
+
+  private handleCarDelete = (carId: string): void => {
+    this.carsCollection.deleteCarById(carId);
+
     this.update();
   };
 

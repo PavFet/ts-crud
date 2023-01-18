@@ -1,3 +1,10 @@
+const countObjectProperties = (object: Object): number => Object.keys(object).length;
+
+type RowData = {
+  id: string,
+  [key: string]: string,
+};
+
 export type TableProps<Type> = {
   title: string,
   columns: Type,
@@ -5,22 +12,20 @@ export type TableProps<Type> = {
   onDelete: (id: string) => void,
 };
 
-type RowData = {
-  id: string,
-  [key: string]: string,
-};
-
-class Table<T extends RowData> {
-  public htmlElement: HTMLTableElement;
-
-  private props: TableProps<T>;
+class Table<Type extends RowData> {
+  private props: TableProps<Type>;
 
   private tbody: HTMLTableSectionElement;
 
   private thead: HTMLTableSectionElement;
 
-  public constructor(props: TableProps<T>) {
+  public htmlElement: HTMLTableElement;
+
+  public constructor(props: TableProps<Type>) {
     this.props = props;
+
+    this.checkColumnsCompatability();
+
     this.htmlElement = document.createElement('table');
     this.thead = document.createElement('thead');
     this.tbody = document.createElement('tbody');
@@ -29,47 +34,32 @@ class Table<T extends RowData> {
     this.renderView();
   }
 
-  private initializeHead = () => {
-    const { title, columns } = this.props;
-
-    const headersArrays = Object.values(columns);
-    const headersRowHtmlStr = `${headersArrays.map((header) => `<th>${header}</th>`).join('')}<th></th>`;
-
-    this.thead.innerHTML = `
-    <tr>
-      <th colspan="${headersArrays.length + 1}" class="text-center h3">${title}</th>
-    </tr>
-    <tr>${headersRowHtmlStr}</tr>
-    `;
-  };
-
-  private initializeTbody = () => {
+  private checkColumnsCompatability = (): void => {
     const { rowsData, columns } = this.props;
 
-    this.tbody.innerHTML = '';
-    const rowsHtmlElements = rowsData.map((rowData) => {
-      const rowHtmlElement = document.createElement('tr');
+    if (this.props.rowsData.length === 0) return;
+    const columnCount = countObjectProperties(columns);
 
-      const cellsHtmlStr = Object.keys(columns).map((key) => `<td>${rowData[key]}</td>`).join(' ');
+    const columnsCompatableWithRowsData = rowsData.every((row) => {
+      const rowCellsCount = countObjectProperties(row);
 
-      rowHtmlElement.innerHTML = cellsHtmlStr;
-      return rowHtmlElement;
+      return rowCellsCount === columnCount;
     });
-    this.tbody.append(...rowsHtmlElements);
+
+    if (!columnsCompatableWithRowsData) {
+      throw new Error('Nesutampa lentelės stulpelių skaičius su eilučių stulpelių skaičiumi');
+    }
   };
 
-   private initialize = (): void => {
-    this.initializeHead();
-    this.initializeTbody();
-
-    this.htmlElement.className = 'table table-dark table-striped';
+  private initialize = (): void => {
+    this.htmlElement.className = 'table table-dark table-striped p-3';
     this.htmlElement.append(
       this.thead,
       this.tbody,
     );
-   };
+  };
 
-   private renderView = (): void => {
+  private renderView = (): void => {
     this.renderHeadView();
     this.renderBodyView();
   };
@@ -78,11 +68,11 @@ class Table<T extends RowData> {
     const { title, columns } = this.props;
 
     const headersArray = Object.values(columns);
-    const headersRowHtmlString = headersArray.map((header) => `<th>${header}</th>`).join('');
+    const headersRowHtmlString = `${headersArray.map((header) => `<th>${header}</th>`).join('')}<th>OPTIONS</th>`;
 
     this.thead.innerHTML = `
       <tr>
-        <th colspan="${headersArray.length}" class="text-center h3">${title}</th>
+        <th colspan="${headersArray.length + 1}" class="text-center h3">${title}</th>
       </tr>
       <tr>${headersRowHtmlString}</tr>`;
   };
@@ -116,7 +106,7 @@ class Table<T extends RowData> {
 
     const deleteButton = document.createElement('button');
     deleteButton.type = 'button';
-    deleteButton.innerHTML = 'Delete';
+    deleteButton.innerHTML = 'DELETE';
     deleteButton.className = 'btn btn-danger';
     deleteButton.addEventListener('click', () => onDelete(id));
     deleteButton.style.width = '80px';
@@ -125,7 +115,7 @@ class Table<T extends RowData> {
     rowHtmlElement.append(buttonCell);
   };
 
-   public updateProps = (newProps: Partial<TableProps<Type>>): void => {
+  public updateProps = (newProps: Partial<TableProps<Type>>): void => {
     this.props = {
       ...this.props,
       ...newProps,

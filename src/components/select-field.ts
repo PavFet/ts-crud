@@ -29,6 +29,7 @@ class SelectField {
     this.htmlLabelElement = document.createElement('label');
 
     this.initialize();
+    this.renderView();
   }
 
   private initialize = (): void => {
@@ -44,6 +45,29 @@ class SelectField {
       this.htmlLabelElement,
       this.htmlSelectElement,
     );
+  };
+
+  private renderView = (): void => {
+    const { labelText, onChange } = this.props;
+
+    this.htmlLabelElement.innerHTML = labelText;
+    this.htmlSelectElement.addEventListener('change', () => onChange(this.htmlSelectElement.value));
+    this.renderSelectOptions();
+  };
+
+  private renderSelectOptions = (): void => {
+    const { options } = this.props;
+
+    const optionsHtmlElements = options.map((option) => {
+      const element = document.createElement('option');
+      element.innerHTML = option.title;
+      element.value = option.value;
+
+      return element;
+    });
+
+    this.htmlSelectElement.innerHTML = '';
+    this.htmlSelectElement.append(...optionsHtmlElements);
   };
 }
 
