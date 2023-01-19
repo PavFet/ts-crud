@@ -48,21 +48,21 @@ class CarForm {
     this.fields = {
       brand: new SelectField({
         name: 'brand',
-        labelText: 'Markė',
+        labelText: 'Brand',
         options: brands.map(({ id, title }) => ({ title, value: id })),
       }),
       model: new SelectField({
         name: 'model',
-        labelText: 'Modelis',
+        labelText: 'Model',
         options: models.map(({ id, title }) => ({ title, value: id })),
       }),
       price: new TextField({
         name: 'price',
-        labelText: 'Kaina',
+        labelText: 'Price',
       }),
       year: new TextField({
         name: 'year',
-        labelText: 'Metai',
+        labelText: 'Year',
       }),
     };
 
@@ -100,7 +100,7 @@ class CarForm {
     const year = formData.get('year') as string | null;
 
     if (!(brand && price && model && year)) {
-      alert('blogi formos duomenys');
+      alert('Bad form data');
       return;
     }
 

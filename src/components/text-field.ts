@@ -36,6 +36,7 @@ class TextField {
     this.htmlLabelElement.setAttribute('for', inputId);
     this.htmlLabelElement.className = 'form-label';
 
+    this.htmlInputElement.setAttribute('placeholder', `${this.props.labelText}`);
     this.htmlInputElement.id = inputId;
     this.htmlInputElement.className = 'form-control';
     this.htmlInputElement.type = 'text';

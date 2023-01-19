@@ -17,13 +17,16 @@ class Table<Type extends RowData> {
 
   private tbody: HTMLTableSectionElement;
 
+  private headerObj: Omit<Type, 'id'>;
+
   private thead: HTMLTableSectionElement;
 
   public htmlElement: HTMLTableElement;
 
   public constructor(props: TableProps<Type>) {
     this.props = props;
-
+    const { id, ...headerObj } = this.props.columns;
+    this.headerObj = headerObj;
     this.checkColumnsCompatability();
 
     this.htmlElement = document.createElement('table');
@@ -65,9 +68,8 @@ class Table<Type extends RowData> {
   };
 
   private renderHeadView = (): void => {
-    const { title, columns } = this.props;
-
-    const headersArray = Object.values(columns);
+    const { title } = this.props;
+    const headersArray = Object.values(this.headerObj);
     const headersRowHtmlString = `${headersArray.map((header) => `<th>${header}</th>`).join('')}<th>OPTIONS</th>`;
 
     this.thead.innerHTML = `
@@ -78,14 +80,14 @@ class Table<Type extends RowData> {
   };
 
   private renderBodyView = (): void => {
-    const { rowsData, columns } = this.props;
+    const { rowsData } = this.props;
 
     this.tbody.innerHTML = '';
     const rowsHtmlElements = rowsData
       .map((rowData) => {
         const rowHtmlElement = document.createElement('tr');
 
-        const cellsHtmlString = Object.keys(columns)
+        const cellsHtmlString = Object.keys(this.headerObj)
           .map((key) => `<td>${rowData[key]}</td>`)
           .join(' ');
 

@@ -2,11 +2,11 @@ import Table from './table';
 import cars from '../data/cars';
 import brands from '../data/brands';
 import models from '../data/models';
-import CarsCollection from '../helpers/cars-collection';
+import CarsCollection, { CarProps } from '../helpers/cars-collection';
 import stringifyProps, { StringifyObjectProps } from '../helpers/stringify-object';
 import CarJoined from '../types/car-joined';
 import SelectField from './select-field';
-import CarForm from './car-form';
+import CarForm, { Values } from './car-form';
 
 class App {
   private carsCollection: CarsCollection;
@@ -32,22 +32,22 @@ class App {
     this.carsCollection = new CarsCollection({ cars, brands, models });
 
     this.carTable = new Table({
-      title: 'Visi automobiliai',
+      title: 'All cars',
       columns: {
         id: 'Id',
-        brand: 'Markė',
-        model: 'Modelis',
-        price: 'Kaina',
-        year: 'Metai',
+        brand: 'Brand',
+        model: 'Model',
+        price: 'Price',
+        year: 'Year',
       },
       rowsData: this.carsCollection.all.map(stringifyProps),
       onDelete: this.handleCarDelete,
     });
 
     this.brandSelect = new SelectField({
-      labelText: 'Markė',
+      labelText: 'Model',
       options: [
-        { title: 'Visi automobiliai', value: '-1' },
+        { title: 'All cars', value: '-1' },
         ...brands.map(({ id, title }) => ({ title, value: id })),
       ],
       onChange: this.handleBrandChange,
@@ -55,15 +55,15 @@ class App {
 
     const initialBrandId = brands[0].id;
     this.carForm = new CarForm({
-      title: 'Sukurkite naują automobilį',
-      submitBtnText: 'Sukurti',
+      title: 'Create new car',
+      submitBtnText: 'Create',
       values: {
         brand: initialBrandId,
         model: models.filter((m) => m.brandId === initialBrandId)[0].id,
-        price: '0',
-        year: '2000',
+        price: '',
+        year: '',
       },
-      onSubmit: () => { },
+      onSubmit: this.handleCreateCar,
     });
   }
 
@@ -80,12 +80,27 @@ class App {
     this.renderView();
   };
 
+  private handleCreateCar = ({
+    brand, model, price, year,
+  }: Values): void => {
+    const carProps: CarProps = {
+      brandId: brand,
+      modelId: model,
+      price: Number(price),
+      year: Number(year),
+    };
+
+    this.carsCollection.add(carProps);
+
+    this.renderView();
+  };
+
   private renderView = () => {
     const { selectedBrandId, carsCollection } = this;
 
     if (selectedBrandId === null) {
       this.carTable.updateProps({
-        title: 'Visi automobiliai',
+        title: 'All cars',
         rowsData: carsCollection.all.map(stringifyProps),
       });
     } else {
@@ -93,7 +108,7 @@ class App {
       if (brand === undefined) throw new Error('Pasirinkta neegzistuojanti markė');
 
       this.carTable.updateProps({
-        title: `${brand.title} markės automobiliai`,
+        title: `Car brand ${brand.title}`,
         rowsData: carsCollection.getByBrandId(selectedBrandId).map(stringifyProps),
       });
     }
