@@ -21,10 +21,12 @@ class App {
 
   private htmlElement: HTMLElement;
 
+  private editedCarId: string | null;
+
   public constructor(selector: string) {
     const foundElement = document.querySelector<HTMLElement>(selector);
     if (foundElement === null) throw new Error(`Nerastas elementas su selektoriumi '${selector}'`);
-
+    this.editedCarId = null;
     this.selectedBrandId = null;
 
     this.htmlElement = foundElement;
@@ -42,6 +44,8 @@ class App {
       },
       rowsData: this.carsCollection.all.map(stringifyProps),
       onDelete: this.handleCarDelete,
+      onEdit: this.handleCarEdit,
+      editedCarId: this.editedCarId,
     });
 
     this.brandSelect = new SelectField({
@@ -66,6 +70,16 @@ class App {
       onSubmit: this.handleCreateCar,
     });
   }
+
+  private handleCarEdit = (carId: string) => {
+    if (this.editedCarId === carId) {
+      this.editedCarId = null;
+    } else {
+      this.editedCarId = carId;
+    }
+
+    this.renderView();
+  };
 
   private handleBrandChange = (brandId: string) => {
     const brand = brands.find((b) => b.id === brandId);
