@@ -67,6 +67,7 @@ class App {
         price: '',
         year: '',
       },
+      isEdited: Boolean(this.editedCarId),
       onSubmit: this.handleCreateCar,
     });
   }
@@ -79,6 +80,24 @@ class App {
     }
 
     this.renderView();
+  };
+
+  private handleUpdateCar = ({
+    brand, model, price, year,
+  }: Values): void => {
+    if (this.editedCarId) {
+      const carProps: CarProps = {
+        brandId: brand,
+        modelId: model,
+        price: Number(price),
+        year: Number(year),
+      };
+
+      this.carsCollection.update(this.editedCarId, carProps);
+      this.editedCarId = null;
+
+      this.renderView();
+    }
   };
 
   private handleBrandChange = (brandId: string) => {
@@ -110,20 +129,63 @@ class App {
   };
 
   private renderView = () => {
-    const { selectedBrandId, carsCollection } = this;
+    const { selectedBrandId, carsCollection, editedCarId } = this;
 
     if (selectedBrandId === null) {
       this.carTable.updateProps({
         title: 'All cars',
         rowsData: carsCollection.all.map(stringifyProps),
+        editedCarId,
       });
     } else {
       const brand = brands.find((b) => b.id === selectedBrandId);
-      if (brand === undefined) throw new Error('Pasirinkta neegzistuojanti markė');
+      if (brand === undefined) throw new Error('Brand not exist');
 
       this.carTable.updateProps({
         title: `Car brand ${brand.title}`,
         rowsData: carsCollection.getByBrandId(selectedBrandId).map(stringifyProps),
+        editedCarId,
+      });
+    }
+    if (editedCarId) {
+      const editedCar = cars.find((c) => c.id === editedCarId);
+      if (!editedCar) {
+        alert('Not found editable car');
+        return;
+      }
+
+      const model = models.find((m) => m.id === editedCar.modelId);
+
+      if (!model) {
+        alert('Not found editable car');
+        return;
+      }
+
+      this.carForm.updateProps({
+        title: 'Update car',
+        submitBtnText: 'Update',
+        values: {
+          brand: model.brandId,
+          model: model.id,
+          price: String(editedCar.price),
+          year: String(editedCar.year),
+        },
+        isEdited: true,
+        onSubmit: this.handleUpdateCar,
+      });
+    } else {
+      const initialBrandId = brands[0].id;
+      this.carForm.updateProps({
+        title: 'Create new car',
+        submitBtnText: 'create',
+        values: {
+          brand: initialBrandId,
+          model: models.filter((m) => m.brandId === initialBrandId)[0].id,
+          price: '',
+          year: '',
+        },
+        isEdited: false,
+        onSubmit: this.handleCreateCar,
       });
     }
   };

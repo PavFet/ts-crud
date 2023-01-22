@@ -15,6 +15,7 @@ type CarFormProps = {
   title: string,
   submitBtnText: string,
   onSubmit: (values: Values) => void,
+  isEdited: boolean,
 };
 
 type Fields = {
@@ -115,7 +116,21 @@ class CarForm {
   };
 
   private renderView = (): void => {
-    const { title, values, submitBtnText } = this.props;
+    const {
+      title, values, submitBtnText, isEdited,
+    } = this.props;
+
+    if (isEdited) {
+      this.htmlElement.classList.add('border');
+      this.htmlElement.classList.add('border-warning');
+      this.htmlSubmitBtn.classList.add('btn-warning');
+      this.htmlSubmitBtn.classList.remove('btn-success');
+    } else {
+      this.htmlElement.classList.remove('border');
+      this.htmlElement.classList.remove('border-warning');
+      this.htmlSubmitBtn.classList.add('btn-success');
+      this.htmlSubmitBtn.classList.remove('btn-warning');
+    }
 
     this.htmlFormHeader.innerHTML = title;
 

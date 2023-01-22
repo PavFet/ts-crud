@@ -57,7 +57,7 @@ class Table<Type extends RowData> {
   };
 
   private initialize = (): void => {
-    this.htmlElement.className = 'table table-dark table-striped p-3';
+    this.htmlElement.className = 'table table table-striped p-3';
     this.htmlElement.append(
       this.thead,
       this.tbody,
@@ -72,7 +72,7 @@ class Table<Type extends RowData> {
   private renderHeadView = (): void => {
     const { title } = this.props;
     const headersArray = Object.values(this.headerObj);
-    const headersRowHtmlString = `${headersArray.map((header) => `<th>${header}</th>`).join('')}<th>OPTIONS</th>`;
+    const headersRowHtmlString = `${headersArray.map((header) => `<th>${header}</th>`).join('')}<th class="th-options">OPTIONS</th>`;
 
     this.thead.innerHTML = `
       <tr>
@@ -107,12 +107,16 @@ class Table<Type extends RowData> {
     const { onDelete, onEdit, editedCarId } = this.props;
 
     const buttonCell = document.createElement('td');
-    buttonCell.className = 'd-flex justify-content-center gap-3';
+    buttonCell.className = 'd-flex justify-content-between gap-3';
 
     const isCancelButton = editedCarId === id;
     const editButton = document.createElement('button');
     editButton.type = 'button';
     editButton.innerHTML = isCancelButton ? 'Cancel' : '✎';
+    if (editButton.innerHTML === 'Cancel') {
+      // eslint-disable-next-line no-param-reassign
+      tr.className = 'tr-active';
+    }
     editButton.className = `btn btn-${isCancelButton ? 'dark' : 'warning'}`;
     editButton.style.width = '80px';
     editButton.addEventListener('click', () => onEdit(id));
